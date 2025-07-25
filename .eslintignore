@@ -1,0 +1,14 @@
+# compiled output
+/.github
+/.yarn
+/dist
+/node_modules
+
+# build output 
+build
+
+# coverage output
+coverage
+/test
+.eslintrc.js
+.jest.config.js
