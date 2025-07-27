@@ -1,98 +1,265 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# NestJS + Kafka Microservices Demo
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+A comprehensive demonstration project showcasing **event-driven microservices architecture** built with **NestJS** and **Apache Kafka**. This project illustrates modern distributed systems patterns including event sourcing, saga pattern, dead letter queues, and resilient error handling.
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Features
 
-## Description
+### Core Architecture
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+- **Event-driven microservices** using Apache Kafka
+- **Saga pattern** for distributed transaction management
+- **Dead Letter Queue (DLQ)** pattern for failed message handling
+- **Retry mechanisms** with exponential backoff
+- **Request/Response** and **Event** messaging patterns
 
-## Project setup
+### Microservices
 
-```bash
-$ npm install
+- **Orders Service**: Order creation, cancellation, and management
+- **Billing Service**: Payment processing with failure simulation
+- **Auth Service**: User management and authentication
+- **Notifications Service**: Event-driven notification system
+
+### Infrastructure Features
+
+- **Rate limiting** with multiple throttling tiers
+- **Global error handling** with custom filters
+- **Request/Response interceptors**
+- **Logging middleware**
+- **Input validation** with class-validator
+- **Docker Compose** setup for local Kafka
+
+## 🏗️ Architecture Overview
+
+```
+┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
+│   Orders API    │    │  Billing API    │    │   Auth API      │    │Notifications API│
+│                 │    │                 │    │                 │    │                 │
+│ • Create Order  │    │ • Process Pay   │    │ • Get User      │    │ • Send Alerts   │
+│ • Cancel Order  │    │ • Handle Fails  │    │ • Authenticate  │    │ • Order Events  │
+│ • List Orders   │    │ • Send to DLQ   │    │                 │    │ • Pay Events    │
+└─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘    └─────────┬───────┘
+          │                      │                      │                      │
+          │              ┌───────▼──────────────────────▼──────────────────────▼───────┐
+          └──────────────►│                     Apache Kafka                           │
+                         │                                                            │
+                         │ • Topics: order.created, payment.failed, billing.dlq      │
+                         │ • Events: order.cancelled, payment.created, user.getUser  │
+                         │ • DLQ Pattern • Saga Pattern • Request/Response Pattern   │
+                         └────────────────────────────────────────────────────────────┘
 ```
 
-## Compile and run the project
+### Event Flow
+
+1. **Order Created** → Triggers payment processing
+2. **Payment Failed** → Saga compensation (order cancellation)
+3. **Billing DLQ** → Failed messages handled with compensation
+4. **Order Cancelled** → Notification events
+
+## 📋 Description
+
+This project demonstrates modern distributed systems patterns and event-driven architecture using NestJS and Apache Kafka. It's designed as a learning resource and interview preparation material for understanding microservices communication, error handling, and resilience patterns.
+
+## 🛠️ Technologies Used
+
+- **NestJS** - Progressive Node.js framework
+- **Apache Kafka** - Distributed event streaming platform
+- **KafkaJS** - Modern Apache Kafka client for Node.js
+- **TypeScript** - Type-safe JavaScript
+- **Docker Compose** - Container orchestration
+- **Class Validator** - Validation decorators
+- **RxJS** - Reactive programming
+
+## 📦 Project Setup
+
+### Prerequisites
+
+- Node.js (v18 or higher)
+- Docker and Docker Compose
+- npm or yarn
+
+### Installation
+
+1. **Clone the repository**
 
 ```bash
-# development
-$ npm run start
-
-# watch mode
-$ npm run start:dev
-
-# production mode
-$ npm run start:prod
+git clone <repository-url>
+cd nest-kafka
 ```
 
-## Run tests
+2. **Install dependencies**
 
 ```bash
-# unit tests
-$ npm run test
-
-# e2e tests
-$ npm run test:e2e
-
-# test coverage
-$ npm run test:cov
+npm install
 ```
 
-## Deployment
-
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
-
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+3. **Start Kafka using Docker Compose**
 
 ```bash
-$ npm install -g @nestjs/mau
-$ mau deploy
+docker-compose up -d
 ```
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+4. **Verify Kafka is running**
 
-## Resources
+```bash
+docker ps
+# You should see a kafka container running on ports 9092 and 9093
+```
 
-Check out a few resources that may come in handy when working with NestJS:
+## 🚀 Running the Application
 
-- Visit the [NestJS Documentation](https://docs.nestjs.com) to learn more about the framework.
-- For questions and support, please visit our [Discord channel](https://discord.gg/G7Qnnhy).
-- To dive deeper and get more hands-on experience, check out our official video [courses](https://courses.nestjs.com/).
-- Deploy your application to AWS with the help of [NestJS Mau](https://mau.nestjs.com) in just a few clicks.
-- Visualize your application graph and interact with the NestJS application in real-time using [NestJS Devtools](https://devtools.nestjs.com).
-- Need help with your project (part-time to full-time)? Check out our official [enterprise support](https://enterprise.nestjs.com).
-- To stay in the loop and get updates, follow us on [X](https://x.com/nestframework) and [LinkedIn](https://linkedin.com/company/nestjs).
-- Looking for a job, or have a job to offer? Check out our official [Jobs board](https://jobs.nestjs.com).
+```bash
+# Development mode with auto-reload
+npm run start:dev
 
-## Support
+# Production mode
+npm run start:prod
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+# Debug mode
+npm run start:debug
+```
 
-## Stay in touch
+The application will start on `http://localhost:3000`
 
-- Author - [Kamil Myśliwiec](https://twitter.com/kammysliwiec)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
+## 🧪 Testing the Event Flow
 
-## License
+### 1. Create an Order
 
-Nest is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
+```bash
+curl -X POST http://localhost:3000/orders \
+  -H "Content-Type: application/json" \
+  -d '{
+    "totalAmount": "99.99",
+    "status": "pending",
+    "userId": "user1"
+  }'
+```
+
+### 2. List Orders
+
+```bash
+curl http://localhost:3000/orders
+```
+
+### 4. Monitor Console Logs
+
+Watch the console for event processing logs including:
+
+- Order creation events
+- Payment processing (with simulated failures)
+- Saga compensation actions
+- DLQ message handling
+
+## 📊 Kafka Topics and Events
+
+### Topics Used
+
+- `order.created` - New order events
+- `order.cancelled` - Order cancellation events
+- `payment.created` - Successful payment events
+- `payment.failed` - Failed payment events
+- `billing.dlq` - Dead letter queue for billing failures
+- `user.getUser` - User lookup requests
+
+### Event Patterns
+
+- **Request/Response**: `user.getUser` pattern
+- **Fire-and-Forget**: Order and payment events
+- **DLQ Pattern**: Failed billing messages
+- **Saga Pattern**: Order cancellation compensation
+
+## 🎯 Key Learning Concepts
+
+### 1. Saga Pattern Implementation
+
+```typescript
+@EventPattern('payment.failed')
+async handlePaymentFailed(@Payload() message: any): Promise<void> {
+  // Compensation logic - cancel the order
+  this.ordersService.cancelOrder(order.id, `Payment failed: ${error}`);
+}
+```
+
+### 2. Dead Letter Queue Pattern
+
+```typescript
+private async sendToDlq(originalMessage: KafkaMessage, error: Error): Promise<void> {
+  const dlqMessage = {
+    originalMessage,
+    error: { message: error.message, stack: error.stack },
+    failedAt: new Date(),
+    retryCount: this.maxRetries,
+  };
+  this.kafkaClient.emit('billing.dlq', { key: originalMessage.key, value: dlqMessage });
+}
+```
+
+### 3. Retry with Exponential Backoff
+
+```typescript
+if (retry < this.maxRetries) {
+  await this.delay(1000 * Math.pow(2, retry)); // Exponential backoff
+  await this.createPayment(order, originalMessage, retry + 1);
+}
+```
+
+## 📁 Project Structure
+
+```
+src/
+├── app.module.ts              # Main application module
+├── main.ts                    # Application entry point with Kafka setup
+├── auth/                      # Authentication microservice
+│   ├── auth.controller.ts     # User endpoints
+│   ├── auth.service.ts        # User management logic
+│   └── entities/user.entity.ts
+├── billing/                   # Billing microservice
+│   ├── billing.controller.ts  # Payment endpoints
+│   ├── billing.service.ts     # Payment processing with DLQ
+│   └── entities/
+│       ├── billingDlq.service.ts
+│       └── payment.entity.ts
+├── orders/                    # Orders microservice
+│   ├── orders.controller.ts   # Order endpoints
+│   ├── orders.service.ts      # Order business logic
+│   ├── orders.saga.service.ts # Saga pattern implementation
+│   ├── dto/create-order.dto.ts
+│   └── entities/order.entity.ts
+├── notifications/             # Notifications microservice
+│   ├── notifications.controller.ts
+│   └── notifications.service.ts
+└── utils/                     # Shared utilities
+    ├── filters/httpException.filter.ts
+    ├── interceptors/response.interceptor.ts
+    └── middlewares/logging.middleware.ts
+```
+
+## 🚨 Error Handling Features
+
+- **Global Exception Filter**: Standardized error responses
+- **Validation Pipes**: Input validation with class-validator
+- **Rate Limiting**: Multi-tier throttling (3/5s, 10/20s, 25/90s)
+- **Retry Logic**: Exponential backoff for failed operations
+- **Dead Letter Queue**: Persistent storage for failed messages
+- **Saga Compensation**: Automatic rollback for failed transactions
+
+## 📖 Learning Resources
+
+This project demonstrates:
+
+- **Event-driven architecture** principles
+- **Microservices communication** patterns
+- **Distributed transaction** management
+- **Error handling** and **resilience** patterns
+- **Apache Kafka** integration with NestJS
+- **Dead Letter Queue** implementation
+- **Saga pattern** for compensation
+
+## 📄 License
+
+This project is [MIT licensed](LICENSE).
+
+---
+
+**Built for learning and demonstration purposes** 🚀
+
+_This project showcases modern microservices patterns and serves as a comprehensive example for understanding event-driven architecture with NestJS and Apache Kafka._
